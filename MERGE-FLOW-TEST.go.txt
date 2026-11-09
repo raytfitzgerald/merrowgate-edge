@@ -1,0 +1,38 @@
+// Throwaway file for exercising the branch -> PR -> merge -> origin flow.
+// NOT part of the gateway. Delete when the test is done.
+//
+// Saved as .go.txt so no Go toolchain picks it up and `go build ./...` is
+// unaffected. Nothing here is referenced by any other file.
+
+package scratch
+
+import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+)
+
+// sealOnce is an arbitrary AES-GCM round trip. Throwaway test content.
+func sealOnce(plaintext []byte) ([]byte, error) {
+	key := make([]byte, 32)
+	if _, err := rand.Read(key); err != nil {
+		return nil, err
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	aead, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonce := make([]byte, aead.NonceSize())
+	if _, err := rand.Read(nonce); err != nil {
+		return nil, err
+	}
+
+	return aead.Seal(nonce, nonce, plaintext, nil), nil
+}
